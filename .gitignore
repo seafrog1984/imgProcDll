@@ -2,3 +2,8 @@
 *.suo
 *.pdb
 *.exp
+*.sdf
+*.obj
+*.log
+*.tlog
+*.ipch
