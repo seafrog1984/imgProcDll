@@ -32,7 +32,7 @@ IMGPROCDLL_API void myResize(Mat & src, Mat &dst,int width, int height);
 
 IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path,int length);
 
-IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, float mintemp , int win_width , int color_type , int filter_type);
+IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, float mintemp , int win_width , int color_type , int filter_type, float bot);
 
 /*
 unsigned short * tmp：原始数据，16bit的short int 指针
@@ -40,8 +40,7 @@ Mat& dst：目标图像，处理的结果
 int img_rows, int img_cols,：图像的行，列数，img_rows*img_cols 应该= 原始数据的长度
 float mintemp = 25：参考温度值，默认25
 int win_width = 16：温度窗宽，默认16
-int color_type = 2：图像配色方案，0：
-int filter_type = 0
-
-
+int color_type = 2：图像配色方案，0-灰度；1-传统伪彩色；2-TTM
+int filter_type = 0 ：滤波方法，0-中值；1-直方图均衡；2-不滤波
+float bot：断层参考值，初始25
 */

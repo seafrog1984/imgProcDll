@@ -47,7 +47,7 @@ IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path, int length)
 }
 
 
-IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, float mintemp = 25, int win_width=16,int color_type = 2, int filter_type = 2)
+IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, float mintemp = 25, int win_width = 16, int color_type = 2, int filter_type = 2, float bot=25)
 {
 	Mat g_tmpdst, tmpdst;
 	tmpdst.create(img_rows, img_cols, CV_8UC3);
@@ -81,7 +81,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 		}
 
 		float range = topvalue - bottomvalue;
-		float bot = mintemp;
+		//float bot = mintemp;
 		float top = bot + win_width;
 		float step = (top - bot) / 12;
 		if (range != 0)
