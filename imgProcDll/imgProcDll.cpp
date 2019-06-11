@@ -26,10 +26,6 @@ using namespace cv;
 //}
 
 
-IMGPROCDLL_API void myResize(Mat & src, Mat &dst, int width, int height)
-{
-	resize(src, dst, Size(width, height));
-}
 
 IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path, int length)
 {
@@ -47,11 +43,34 @@ IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path, int length)
 }
 
 
-IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, float mintemp = 25, int win_width = 16, int color_type = 2, int filter_type = 2, float bot=25)
+IMGPROCDLL_API void data2Temper(unsigned short * tmp, Mat&T, int img_rows, int img_cols, float x=100.00)
+{
+	int i, col, row;
+	float value;
+	unsigned short *src = (unsigned short *)tmp;
+
+	for (int i = 0; i < img_rows*img_cols; i++)
+	{
+		value = *src++;
+
+		float temper = (value - 10000) / x;
+
+		row = i / img_cols;
+		col = i%img_cols;
+
+
+		float* pG_dstData = T.ptr<float>(row);
+
+		*(pG_dstData + col) = temper;
+	}
+}
+
+IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, int win_width = 16, int color_type = 2, int filter_type = 2, float bot=22)
 {
 	Mat g_tmpdst, tmpdst;
 	tmpdst.create(img_rows, img_cols, CV_8UC3);
 	g_tmpdst.create(img_rows, img_cols, CV_8UC1);
+	if (bot < 0) bot = 0;
 
 	if (tmp)
 	{
@@ -95,26 +114,19 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 				if (value > topvalue)    value = topvalue;
 				// Scale to 0..255 for display
 				displayValue = ((value - bottomvalue) * 255) / range;
-				//float tmper;
-				//if (displayValue < 40)
-				//{
-				//	tmper = 0;
-				//}
-				//else
-				//{
-				//	tmper = mintemp + ((value - bottomvalue) * 15) / range;
-				//}
-				float tmper = mintemp + ((value - bottomvalue) * 15) / range;
-				//			float tmper = value/100;
+
+				float tmper = (value -10000) / 100.00;
+	
 				row = i / img_cols;
 				col = i%img_cols;
 
-				//g_tmpdst.at<uchar>(row, col) = displayValue;
+
 				uchar* pG_dstData = g_tmpdst.ptr<uchar>(row);
 
-				*(pG_dstData + col) = displayValue;
+				*(pG_dstData + col) = bot-22+displayValue;
 
 				uchar* p_tmpdstData = tmpdst.ptr<uchar>(row);
+
 				switch (color_type)
 				{
 				case 1:////´«Í³Î±²ÊÉ«
@@ -125,7 +137,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 						*(p_tmpdstData + col * 3 + 1) = 0;
 						*(p_tmpdstData + col * 3) = 0;
 					}
-					if (tmper < bot + step)
+					else if (tmper < bot + step)
 					{
 						*(p_tmpdstData + col * 3 + 2) = 0;
 						*(p_tmpdstData + col * 3 + 1) = (tmper - bot) * 255 / step;
@@ -166,7 +178,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 						*(p_tmpdstData + col * 3 + 1) = 0;
 						*(p_tmpdstData + col * 3) = 0;
 					}
-					if (tmper < bot + step*1.5)
+					else if (tmper < bot + step*1.5)
 					{
 						*(p_tmpdstData + col * 3 + 2) = (tmper - bot) * 84 / (step*1.5);;
 						*(p_tmpdstData + col * 3 + 1) = (tmper - bot) * 84 / (step*1.5);
@@ -257,7 +269,6 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 		}
 	}
 
-	//	Mat g_dstImage2, g_dstImage3, g_dstImage4, tempImage,g_tempImage;
 	Mat tmpdst2;
 	if (filter_type == 0)
 	{
@@ -309,38 +320,13 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 
 		flip(dst, dst, 0);     //¾µÏñ
 
-		//for (int i = 0; i < g_tmpdst2.rows; i++)
-		//{
 
-		//	uchar *p_gtmpdstData = g_tmpdst2.ptr<uchar>(i);
-
-		//	for (int j = 0; j < g_tmpdst2.cols; j++)
-		//	{
-		//		uchar *p_dstData = dst.ptr<uchar>(j);
-		//		//dst.at<uchar>(j, HEIGHT - 1 - i) = g_tmpdst.at<uchar>(i, j);
-		//		*(p_dstData + (img_rows - 1 - i)) = *(p_gtmpdstData + j);
-
-		//	}
-		//}
 	}
 	else
 	{
 		//	tmpdst.copyTo(tmpdst2);
 		dst.create(Size(tmpdst2.rows, tmpdst2.cols), CV_8UC3);
-		//for (int i = 0; i < tmpdst2.rows; i++)
-		//{
-		//	uchar* p_tmpdstData = tmpdst2.ptr<uchar>(i);
-		//	for (int j = 0; j < tmpdst2.cols; j++)
-		//	{
-		//		//	dst.at<Vec3b>(j, HEIGHT - 1 - i)[0] = tmpdst2.at<Vec3b>(i, j)[0];
-		//		//	dst.at<Vec3b>(j, HEIGHT - 1 - i)[1] = tmpdst2.at<Vec3b>(i, j)[1];
-		//		//	dst.at<Vec3b>(j, HEIGHT - 1 - i)[2] = tmpdst2.at<Vec3b>(i, j)[2];
-		//		uchar *p_dstData = dst.ptr<uchar>(j);
-		//		*(p_dstData + (img_rows - 1 - i) * 3) = *(p_tmpdstData + j * 3);
-		//		*(p_dstData + (img_rows - 1 - i) * 3 + 1) = *(p_tmpdstData + j * 3 + 1);
-		//		*(p_dstData + (img_rows - 1 - i) * 3 + 2) = *(p_tmpdstData + j * 3 + 2);
-		//	}
-		//}
+
 		transpose(tmpdst2,dst);     //×ªÖÃ
 
 		flip(dst, dst, 0);     //¾µÏñ
