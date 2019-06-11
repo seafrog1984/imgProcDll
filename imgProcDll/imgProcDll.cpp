@@ -70,7 +70,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 	Mat g_tmpdst, tmpdst;
 	tmpdst.create(img_rows, img_cols, CV_8UC3);
 	g_tmpdst.create(img_rows, img_cols, CV_8UC1);
-	if (bot < 0) bot = 0;
+
 
 	if (tmp)
 	{
@@ -82,7 +82,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 		int i, end, col, row;
 		float value;
 		unsigned short *src = (unsigned short *)tmp;
-		//unsigned char  *dest = (unsigned char  *)m_ImageData8;
+	
 		unsigned char displayValue;
 		end = img_rows*img_cols;  // image size...
 
@@ -100,7 +100,7 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 		}
 
 		float range = topvalue - bottomvalue;
-		//float bot = mintemp;
+
 		float top = bot + win_width;
 		float step = (top - bot) / 12;
 		if (range != 0)
@@ -123,7 +123,11 @@ IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int i
 
 				uchar* pG_dstData = g_tmpdst.ptr<uchar>(row);
 
-				*(pG_dstData + col) = bot-22+displayValue;
+				int gray = bot - 22 + displayValue;
+				if (gray < 0) gray = 0;
+				if (gray >255) gray = 255;
+
+				*(pG_dstData + col) = gray;
 
 				uchar* p_tmpdstData = tmpdst.ptr<uchar>(row);
 
