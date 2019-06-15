@@ -59,9 +59,9 @@ IMGPROCDLL_API void data2Temper(unsigned short * tmp, Mat&T, int img_rows, int i
 		col = i%img_cols;
 
 
-		float* pG_dstData = T.ptr<float>(row);
+		float* pG_dstData = T.ptr<float>(img_cols-1-col);
 
-		*(pG_dstData + col) = temper;
+		*(pG_dstData + row) = temper;
 	}
 }
 
