@@ -42,6 +42,37 @@ IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path, int length)
 
 }
 
+IMGPROCDLL_API void data2TemperCorrect(unsigned short * tmp, Mat&T, int img_rows, int img_cols, float x = 100.00, float inputEmiss = 1, float	inputReflect = 20, float inputDis = 2)
+{
+	
+	int i, col, row;
+	float value;
+	unsigned short *src = (unsigned short *)tmp;
+	STAT_TEMPER *pFull_temper = new STAT_TEMPER;
+
+	for (int i = 0; i < img_rows*img_cols; i++)
+	{
+		value = *src++;
+
+		float temper = (value - 10000) / x;
+
+		pFull_temper->avgTemper = temper;
+
+		IRSDK_TempCorrect(inputEmiss, inputReflect, inputDis, pFull_temper);
+
+		row = i / img_cols;
+		col = i%img_cols;
+
+
+		float* pG_dstData = T.ptr<float>(img_cols - 1 - col);
+
+		*(pG_dstData + row) = pFull_temper->avgTemper;
+	}
+
+	delete pFull_temper;
+
+}
+
 
 IMGPROCDLL_API void data2Temper(unsigned short * tmp, Mat&T, int img_rows, int img_cols, float x=100.00)
 {

@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <opencv2/opencv.hpp>
+#include "IRSDK.h"
 
 using namespace cv;
 using namespace std;
@@ -31,6 +32,8 @@ using namespace std;
 IMGPROCDLL_API void dataRead(unsigned short * tmp, char* m_path,int length);//读取数据
 
 IMGPROCDLL_API void data2Temper(unsigned short * tmp, Mat&T, int img_rows, int img_cols, float x);// 获取温度矩阵
+
+IMGPROCDLL_API void data2TemperCorrect(unsigned short * tmp, Mat&T, int img_rows, int img_cols, float x , float inputEmiss,float	inputReflect,float inputDis);// 增加辐射率，环境温度，距离
 
 IMGPROCDLL_API void data2Img(unsigned short * tmp, Mat& dst, int img_rows, int img_cols, int win_width , int color_type , int filter_type, float bot);
 /*
